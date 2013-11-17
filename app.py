@@ -7,6 +7,7 @@ import cherrypy
 from twython import Twython
 
 # https://dev.twitter.com/apps/5382803/show
+# SECRET keys set using 'heroku config:set TWITTER_CONSUMER_SECRET=asdfasdfasdfasdfdsa...'
 CONSUMER_KEY = 'YWb4cVBBjGX8mDrxcpvNuw'
 CONSUMER_SECRET = os.environ['TWITTER_CONSUMER_SECRET']
 OAUTH_TOKEN = '2198617098-z38OQ30I0OEG7xEkNmPZPHhb3J7UUI5Yc8d0jdF'
