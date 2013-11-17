@@ -2,7 +2,6 @@ import os
 import json
 from random import choice
 from urllib2 import urlopen
-from subprocess import Popen
 
 from twython import Twython
 
