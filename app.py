@@ -3,6 +3,7 @@ from urllib2 import urlopen
 import json
 from random import choice
 
+import cherrypy
 from twython import Twython
 
 # https://dev.twitter.com/apps/5382803/show
@@ -29,21 +30,25 @@ def urban_dictionary_words():
     results = z['list']
     return results
 
-def make_tweet_from_words(results):
+def get_tweet_from_words(results):
     valids = [x for x in results if len(x['example']) <= EXAMPLE_LENGTH]
     result = choice(valids)
     message = '{0} {1}'.format(result['example'], result['permalink'])
     return message
 
-def main():
+def make_next_post():
     results = urban_dictionary_words()
-    message = make_tweet_from_words(results)
-
+    message = get_tweet_from_words(results)
     handle = user_handle()
     tweet(handle, message)
+    return message
     # i = raw_input('Posting: "{0}" Continue? '.format(message))
     # if i.lower().startswith('y'):
     #     tweet(handle, message)
 
-if __name__ == '__main__':
-    main()
+class Root(object):
+    def index(self):
+        return make_next_post()
+    index.exposed = True
+
+cherrypy.quickstart(Root())
