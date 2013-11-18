@@ -14,7 +14,7 @@ OAUTH_TOKEN_SECRET = os.environ['TWITTER_OAUTH_TOKEN_SECRET']
 TWEET_LENGTH = 140
 TWEET_URL_LENGTH = 21
 
-TWEET_EVERY_N_SECONDS = 60*5 # e.g. 60*10 = ten minutes between each tweet
+TWEET_EVERY_N_SECONDS = 60*1 # e.g. 60*10 = ten minutes between each tweet
 
 EXAMPLE_LENGTH = TWEET_LENGTH - TWEET_URL_LENGTH
 URBAN_DICTIONARY_URL = 'http://api.urbandictionary.com/v0/random'
@@ -41,11 +41,11 @@ def get_tweet_from_words(results):
 def main():
     handle = user_handle()
     while True:
-        time.sleep(TWEET_EVERY_N_SECONDS)
         results = urban_dictionary_words()
         message = get_tweet_from_words(results)
         tweet(handle, message)
         print message
+        time.sleep(TWEET_EVERY_N_SECONDS)
 
 if __name__ == '__main__':
     main()
