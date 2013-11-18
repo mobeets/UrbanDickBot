@@ -1,13 +1,51 @@
 import os
-from subprocess import Popen
-import cherrypy
+import time
+import json
+from random import choice
+from urllib2 import urlopen
 
-class Root(object):
-    def index(self):
-        Popen(['python', 'model.py'])
-        return 'SUCCESS!'
-    index.exposed = True
+from twython import Twython
 
-cherrypy.config.update({'server.socket_host': '0.0.0.0',})
-cherrypy.config.update({'server.socket_port': int(os.environ.get('PORT', '5000')),})
-cherrypy.quickstart(Root())
+# https://dev.twitter.com/apps/5382803/show
+CONSUMER_KEY = os.environ['TWITTER_CONSUMER_KEY']
+CONSUMER_SECRET = os.environ['TWITTER_CONSUMER_SECRET']
+OAUTH_TOKEN = os.environ['TWITTER_OAUTH_TOKEN']
+OAUTH_TOKEN_SECRET = os.environ['TWITTER_OAUTH_TOKEN_SECRET']
+TWEET_LENGTH = 140
+TWEET_URL_LENGTH = 21
+
+TWEET_EVERY_N_SECONDS = 60*1 # e.g. 60*10 = ten minutes between each tweet
+
+EXAMPLE_LENGTH = TWEET_LENGTH - TWEET_URL_LENGTH
+URBAN_DICTIONARY_URL = 'http://api.urbandictionary.com/v0/random'
+
+def user_handle():
+    return Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+def tweet(handle, message):
+    handle.update_status(status=message)
+
+def urban_dictionary_words():
+    x = urlopen(URBAN_DICTIONARY_URL)
+    y = x.readlines()
+    z = json.loads(y[0])
+    results = z['list']
+    return results
+
+def get_tweet_from_words(results):
+    valids = [x for x in results if len(x['example']) <= EXAMPLE_LENGTH]
+    result = choice(valids)
+    message = '{0} {1}'.format(result['example'], result['permalink'])
+    return message
+
+def main():
+    handle = user_handle()
+    while True:
+        time.sleep(TWEET_EVERY_N_SECONDS)
+        results = urban_dictionary_words()
+        message = get_tweet_from_words(results)
+        tweet(handle, message)
+        print message
+
+if __name__ == '__main__':
+    main()
